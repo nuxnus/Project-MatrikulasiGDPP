@@ -46,6 +46,7 @@ public class PlayerMovement : MonoBehaviour
     private float _speed;
     private bool _isGrounded;
     private PlayerStance _playerStance;
+    private Animator _animator;
     private void Start()
     {
         _input.OnMoveInput += Move;
@@ -65,6 +66,7 @@ public class PlayerMovement : MonoBehaviour
         _input.OnJumpInput += Jump;
         _playerStance = PlayerStance.Stand;
         HideAndLockCursor();
+        _animator = GetComponent<Animator>();
     }
     
     private void OnDestroy()
@@ -83,6 +85,7 @@ public class PlayerMovement : MonoBehaviour
         bool isPlayerClimbing = _playerStance == PlayerStance.Climb;
         if (isPlayerStanding)
         {
+            
             switch (_cameraManager.CameraState)
             {
                 case CameraState.ThirdPerson:
@@ -92,7 +95,7 @@ public class PlayerMovement : MonoBehaviour
                         float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, rotationAngle, ref _rotationSmoothVelocity, _rotationSmoothTime);
                         transform.rotation = Quaternion.Euler(0f, smoothAngle, 0f);
                         movementDirection = Quaternion.Euler(0f, rotationAngle, 0f) * Vector3.forward;
-                        _rigidbody.AddForce(movementDirection * Time.deltaTime * _speed);
+                        _rigidbody.AddForce(movementDirection.normalized * Time.deltaTime * _speed);
                     }
                     break;
                 case CameraState.FirstPerson:
@@ -100,11 +103,13 @@ public class PlayerMovement : MonoBehaviour
                     Vector3 verticalDirection = axisDirection.y * transform.forward;
                     Vector3 horizontalDirection = axisDirection.x * transform.right;
                     movementDirection = verticalDirection + horizontalDirection;
-                    _rigidbody.AddForce(movementDirection * Time.deltaTime * _speed);
+                    _rigidbody.AddForce(movementDirection.normalized * Time.deltaTime * _speed);
                     break;
                 default:
                     break;
             }
+            Vector3 velocity = new Vector3(_rigidbody.linearVelocity.x, 0, _rigidbody.linearVelocity.z);
+            _animator.SetFloat("Velocity", velocity.magnitude * axisDirection.magnitude);
         }
         else if (isPlayerClimbing)
         {
@@ -177,6 +182,7 @@ public class PlayerMovement : MonoBehaviour
             
             _cameraManager.SetFPSClampedCamera(true,
                 transform.rotation.eulerAngles);
+            _cameraManager.SetTPSFieldOfView(70);
         }
     }
     private void CancelClimb()
@@ -189,6 +195,7 @@ public class PlayerMovement : MonoBehaviour
             
             _cameraManager.SetFPSClampedCamera(false,
                 transform.rotation.eulerAngles);
+            _cameraManager.SetTPSFieldOfView(50);
         }
     }
     private void HideAndLockCursor()
