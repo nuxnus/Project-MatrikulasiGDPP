@@ -10,6 +10,7 @@ public class InputManager : MonoBehaviour
     public Action OnClimbInput;
     public Action OnCancelClimb;
     public Action OnChangePOV;
+    public Action OnCrouchInput;
     private void Update()
     {
         CheckMovementInput();
@@ -68,11 +69,10 @@ public class InputManager : MonoBehaviour
 
     private void CheckCrouchInput()
     {
-        bool isPressCrouchInput = Input.GetKeyDown(KeyCode.LeftControl) ||
-                                  Input.GetKeyDown(KeyCode.RightControl);
+        bool isPressCrouchInput = Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl);
         if (isPressCrouchInput)
         {
-            Debug.Log("Crouch");
+            OnCrouchInput();
         }
     }
 

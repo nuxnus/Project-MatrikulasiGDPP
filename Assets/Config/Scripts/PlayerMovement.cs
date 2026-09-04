@@ -40,6 +40,8 @@ public class PlayerMovement : MonoBehaviour
     private Transform _cameraTransform;
     [SerializeField]
     private CameraManager _cameraManager;
+    [SerializeField]
+    private float _crouchSpeed;
     
     private Rigidbody _rigidbody;
     private float _rotationSmoothVelocity;
@@ -47,12 +49,15 @@ public class PlayerMovement : MonoBehaviour
     private bool _isGrounded;
     private PlayerStance _playerStance;
     private Animator _animator;
+    private CapsuleCollider _collider;
     private void Start()
     {
         _input.OnMoveInput += Move;
         _input.OnSprintInput += Sprint;
         _input.OnClimbInput += StartClimb;
         _input.OnCancelClimb += CancelClimb;
+        _cameraManager.OnChangePerspective += ChangePerspective;
+        _input.OnCrouchInput += Crouch;
     }
     private void Update()
     {
@@ -67,6 +72,7 @@ public class PlayerMovement : MonoBehaviour
         _playerStance = PlayerStance.Stand;
         HideAndLockCursor();
         _animator = GetComponent<Animator>();
+        _collider = GetComponent<CapsuleCollider>();
     }
     
     private void OnDestroy()
@@ -76,6 +82,8 @@ public class PlayerMovement : MonoBehaviour
         _input.OnJumpInput -= Jump;
         _input.OnClimbInput += StartClimb;
         _input.OnCancelClimb -= CancelClimb;
+        _cameraManager.OnChangePerspective -= ChangePerspective;
+        _input.OnCrouchInput -= Crouch;
     }
     
     private void Move(Vector2 axisDirection)
@@ -143,12 +151,13 @@ public class PlayerMovement : MonoBehaviour
         {
             Vector3 jumpDirection = Vector3.up;
             _rigidbody.AddForce(jumpDirection * _jumpForce * Time.deltaTime);
-            
+            _animator.SetTrigger("Jump");
         }
     }
     private void CheckIsGrounded()
     {
         _isGrounded = Physics.CheckSphere(_groundDetector.position, _detectorRadius, _groundLayer);
+        _animator.SetBool("IsGrounded", _isGrounded);
     }
     private void CheckStep()
     {
@@ -202,5 +211,26 @@ public class PlayerMovement : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+    private void ChangePerspective()
+    {
+        _animator.SetTrigger("ChangePerspective");
+    }
+    private void Crouch()
+    {
+        if (_playerStance == PlayerStance.Stand)
+        {
+            
+            _playerStance = PlayerStance.Crouch;
+            _animator.SetBool("IsCrouch", true);
+            _speed = _crouchSpeed;
+        }
+        else if (_playerStance == PlayerStance.Crouch)
+        {
+            
+            _playerStance = PlayerStance.Stand;
+            _animator.SetBool("IsCrouch", false);
+            _speed = _walkSpeed;
+        }
     }
 }
