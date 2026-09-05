@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -52,6 +53,16 @@ public class PlayerMovement : MonoBehaviour
     private float _minGlideRotationX;
     [SerializeField]
     private float _maxGlideRotationX;
+    [SerializeField]
+    private float _resetComboInterval;
+    [SerializeField]
+    private Transform _hitDetector;
+    [SerializeField]
+    private float _hitDetectorRadius;
+    [SerializeField]
+    private LayerMask _hitLayer;
+    
+    private Coroutine _resetCombo;
     
     private Rigidbody _rigidbody;
     private float _rotationSmoothVelocity;
@@ -60,6 +71,8 @@ public class PlayerMovement : MonoBehaviour
     private PlayerStance _playerStance;
     private Animator _animator;
     private CapsuleCollider _collider;
+    private bool _isPunching;
+    private int _combo = 0;
     
     private void Start()
     {
@@ -71,6 +84,7 @@ public class PlayerMovement : MonoBehaviour
         _input.OnCrouchInput += Crouch;
         _input.OnGlideInput += StartGlide;
         _input.OnCancelGlide += CancelGlide;
+        _input.OnPunchInput += Punch;
     }
     private void Update()
     {
@@ -100,6 +114,7 @@ public class PlayerMovement : MonoBehaviour
         _input.OnCrouchInput -= Crouch;
         _input.OnGlideInput -= StartGlide;
         _input.OnCancelGlide -= CancelGlide;
+        _input.OnPunchInput -= Punch;
     }
     
     private void Move(Vector2 axisDirection)
@@ -109,7 +124,7 @@ public class PlayerMovement : MonoBehaviour
         bool isPlayerCrouching = _playerStance == PlayerStance.Crouch;
         bool isPlayerClimbing = _playerStance == PlayerStance.Climb;
         bool isPlayerGliding = _playerStance == PlayerStance.Glide;
-        if (isPlayerStanding || isPlayerCrouching)
+        if (isPlayerStanding || isPlayerCrouching && !_isPunching)
         {
             
             switch (_cameraManager.CameraState)
@@ -121,15 +136,7 @@ public class PlayerMovement : MonoBehaviour
                         float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, rotationAngle, ref _rotationSmoothVelocity, _rotationSmoothTime);
                         transform.rotation = Quaternion.Euler(0f, smoothAngle, 0f);
                         movementDirection = Quaternion.Euler(0f, rotationAngle, 0f) * Vector3.forward;
-                        if (isPlayerStanding == true)
-                        {
-                            _rigidbody.AddForce(movementDirection.normalized * Time.deltaTime * _speed);
-                        }
-                        else
-                        {
-                            _rigidbody.AddForce(movementDirection.normalized * Time.deltaTime * _crouchSpeed);
-                        }
-                        
+                        _rigidbody.AddForce(movementDirection.normalized * Time.deltaTime * _speed);
                     }
                     break;
                 case CameraState.FirstPerson:
@@ -306,6 +313,50 @@ public class PlayerMovement : MonoBehaviour
             Vector3 forwardForce = transform.forward * _glideSpeed;
             Vector3 totalForce = upForce + forwardForce;
             _rigidbody.AddForce(totalForce * Time.deltaTime);
+        }
+    }
+    private void Punch()
+    {
+        if (!_isPunching && _playerStance == PlayerStance.Stand)
+        {
+            _isPunching = true;
+            if (_combo < 3)
+            {
+                _combo = _combo + 1;
+            }
+            else
+            {
+                _combo = 1;
+            }
+            _animator.SetInteger("Combo", _combo);
+            _animator.SetTrigger("Punch");
+        }
+    }
+    private void EndPunch()
+    {
+        if (_resetCombo != null)
+        {
+            StopCoroutine(_resetCombo);
+        }
+        _resetCombo = StartCoroutine(ResetCombo());
+        _isPunching = false;
+    }
+    private IEnumerator ResetCombo()
+    {
+        yield return new WaitForSeconds(_resetComboInterval);
+        _combo = 0;
+    }
+    private void Hit()
+    {
+        Collider[] hitObjects = Physics.OverlapSphere(_hitDetector.position,
+            _hitDetectorRadius,
+            _hitLayer);
+        for (int i = 0; i < hitObjects.Length; i++)
+        {
+            if (hitObjects[i].gameObject != null)
+            {
+                Destroy(hitObjects[i].gameObject);
+            }
         }
     }
 }

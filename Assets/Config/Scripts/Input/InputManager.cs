@@ -13,6 +13,7 @@ public class InputManager : MonoBehaviour
     public Action OnCrouchInput;
     public Action OnGlideInput;
     public Action OnCancelGlide;
+    public Action OnPunchInput;
     private void Update()
     {
         CheckMovementInput();
@@ -130,10 +131,9 @@ public class InputManager : MonoBehaviour
     private void CheckPunchInput()
     {
         bool isPressPunchInput = Input.GetKeyDown(KeyCode.Mouse0);
-
         if (isPressPunchInput)
         {
-            Debug.Log("Punch");
+            OnPunchInput();
         }
     }
 
