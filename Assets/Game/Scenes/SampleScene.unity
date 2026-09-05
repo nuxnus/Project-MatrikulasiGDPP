@@ -206,8 +206,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.44967598, y: 0.000000027279981, z: -0.000000013734064, w: 0.89319175}
-  m_LocalPosition: {x: 0, y: 3.0386686, z: -2.2529483}
+  m_LocalRotation: {x: 0.032196373, y: 0.000000041278696, z: -0.0000000013297138, w: 0.99948156}
+  m_LocalPosition: {x: 0, y: 2, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -871,7 +871,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineRotationComposer
   Composition:
-    ScreenPosition: {x: 0, y: 0}
+    ScreenPosition: {x: 0, y: 0.5}
     DeadZone:
       Enabled: 0
       Size: {x: 0.2, y: 0.2}
@@ -879,7 +879,7 @@ MonoBehaviour:
       Enabled: 0
       Size: {x: 0.8, y: 0.8}
       Offset: {x: 0, y: 0}
-  CenterOnActivate: 1
+  CenterOnActivate: 0
   TargetOffset: {x: 0, y: 0, z: 0}
   Damping: {x: 0.5, y: 0.5}
   Lookahead:
@@ -911,7 +911,7 @@ MonoBehaviour:
   Orbits:
     Top:
       Radius: 1.25
-      Height: 3.69
+      Height: 3.63
     Center:
       Radius: 3
       Height: 2
@@ -931,8 +931,8 @@ MonoBehaviour:
       Time: 2
     Restrictions: 0
   VerticalAxis:
-    Value: 45
-    Center: 45
+    Value: 0
+    Center: 0
     Range: {x: -85, y: 85}
     Wrap: 0
     Recentering:
@@ -1001,8 +1001,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1263938054}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.44967598, y: 0.00000002727998, z: -0.000000013734063, w: 0.89319175}
-  m_LocalPosition: {x: 0, y: 3.0386686, z: -2.2529483}
+  m_LocalRotation: {x: 0.032196373, y: 0.0000000412787, z: -0.0000000013297142, w: 0.99948156}
+  m_LocalPosition: {x: 0, y: 2, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2827,6 +2827,11 @@ MonoBehaviour:
   _cameraTransform: {fileID: 330585546}
   _cameraManager: {fileID: 925178234}
   _crouchSpeed: 325
+  _glideSpeed: 70
+  _airDrag: 5
+  _glideRotationSpeed: {x: 20, y: 40, z: 20}
+  _minGlideRotationX: -10
+  _maxGlideRotationX: 14
 --- !u!54 &2138983533507964614
 Rigidbody:
   m_ObjectHideFlags: 0
