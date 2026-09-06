@@ -61,6 +61,9 @@ public class PlayerMovement : MonoBehaviour
     private float _hitDetectorRadius;
     [SerializeField]
     private LayerMask _hitLayer;
+    [SerializeField]
+    private PlayerAudioManager _playerAudioManager;
+    
     
     private Coroutine _resetCombo;
     
@@ -289,6 +292,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (_playerStance != PlayerStance.Glide && !_isGrounded)
         {
+            _playerAudioManager.PlayGlideSfx();
             _playerStance = PlayerStance.Glide;
             _animator.SetBool("IsGliding", true);
             _cameraManager.SetFPSClampedCamera(true, transform.rotation.eulerAngles);
@@ -298,6 +302,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (_playerStance == PlayerStance.Glide)
         {
+            _playerAudioManager.StopGlideSfx();
             _playerStance = PlayerStance.Stand;
             _animator.SetBool("IsGliding", false);
             _cameraManager.SetFPSClampedCamera(false, transform.rotation.eulerAngles);
